@@ -79,6 +79,20 @@ All intermediate and final outputs are written as JSON into `surveys/<name>/runs
 
 ---
 
+## Deployment
+
+| File | Purpose |
+|------|---------|
+| [Dockerfile](Dockerfile) | Multi-stage build — Node builds the React frontend, Python image runs the server |
+| [.dockerignore](.dockerignore) | Excludes `.venv/`, `surveys/`, build artifacts from the image |
+| [fly.toml](fly.toml) | fly.io config — 512MB shared VM, auto-stop, 1GB volume at `/data` |
+| [deploy.py](deploy.py) | `uv run deploy.py [setup \| deploy \| publish \| pull]` — fly.io helpers |
+| [.github/workflows/deploy.yml](.github/workflows/deploy.yml) | Auto-deploys to fly.io on push to `main` (requires `FLY_API_TOKEN` secret) |
+
+`surveys/` is **not** baked into the image — it lives on a persistent fly.io volume (`/data/surveys`). Push new run results with `uv run deploy.py publish`.
+
+---
+
 ## Survey data format
 
 `surveys/<name>/survey.yaml` — questions with `real_distribution.overall` (required) and optional demographic slices (`by_party`, `by_age`, etc.)
