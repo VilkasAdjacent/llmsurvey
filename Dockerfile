@@ -11,9 +11,8 @@ FROM python:3.12-slim
 WORKDIR /app
 
 COPY pyproject.toml ./
-RUN pip install --no-cache-dir .
-
 COPY llmsurvey/ ./llmsurvey/
+RUN pip install --no-cache-dir .
 COPY templates/ ./templates/
 COPY --from=frontend-builder /app/frontend/dist ./frontend/dist
 
