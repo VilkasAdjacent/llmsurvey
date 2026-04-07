@@ -1,0 +1,73 @@
+name: "Pew Research: American Values Survey 2024"
+source: "Pew Research Center, October 2024"
+source_url: "https://www.pewresearch.org/politics/2024/10/09/american-values-survey-2024/"
+questions:
+  - id: q1
+    text: "Overall, are you satisfied or dissatisfied with the way things are going in the country today?"
+    type: single_choice
+    options:
+      - "Satisfied"
+      - "Dissatisfied"
+      - "Don't know"
+    real_distribution:
+      overall:
+        "Satisfied": 0.23
+        "Dissatisfied": 0.73
+        "Don't know": 0.04
+      by_party:
+        Democrat:
+          "Satisfied": 0.31
+          "Dissatisfied": 0.65
+          "Don't know": 0.04
+        Republican:
+          "Satisfied": 0.12
+          "Dissatisfied": 0.84
+          "Don't know": 0.04
+
+  - id: q2
+    text: "How much do you trust the federal government to do what is right?"
+    type: single_choice
+    options:
+      - "Always"
+      - "Most of the time"
+      - "Some of the time"
+      - "Never"
+    real_distribution:
+      overall:
+        "Always": 0.02
+        "Most of the time": 0.20
+        "Some of the time": 0.66
+        "Never": 0.12
+      by_party:
+        Democrat:
+          "Always": 0.03
+          "Most of the time": 0.29
+          "Some of the time": 0.61
+          "Never": 0.07
+        Republican:
+          "Always": 0.01
+          "Most of the time": 0.09
+          "Some of the time": 0.72
+          "Never": 0.18
+
+  - id: q3
+    text: "Do you think the economic system in this country is basically fair or does it unfairly favor powerful interests?"
+    type: single_choice
+    options:
+      - "Basically fair"
+      - "Unfairly favors powerful interests"
+      - "Don't know"
+    real_distribution:
+      overall:
+        "Basically fair": 0.35
+        "Unfairly favors powerful interests": 0.60
+        "Don't know": 0.05
+      by_party:
+        Democrat:
+          "Basically fair": 0.24
+          "Unfairly favors powerful interests": 0.72
+          "Don't know": 0.04
+        Republican:
+          "Basically fair": 0.48
+          "Unfairly favors powerful interests": 0.47
+          "Don't know": 0.05

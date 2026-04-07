@@ -1,0 +1,26 @@
+label: "US Adult Population (Census 2023 ACS)"
+census_query:
+  dataset: "acs/acs1"
+  year: 2023
+  geography: "us:*"
+  variables: ["B01001_001E", "B02001_002E"]
+# Manual override used by default (Census query requires additional processing)
+manual_distribution:
+  age_18_29: 0.21
+  age_30_44: 0.25
+  age_45_64: 0.30
+  age_65_plus: 0.24
+  male: 0.49
+  female: 0.51
+  white: 0.60
+  black: 0.13
+  hispanic: 0.19
+  other: 0.08
+  college_grad: 0.38
+  no_college: 0.62
+  party_democrat: 0.31
+  party_republican: 0.27
+  party_independent: 0.38
+  income_under_50k: 0.33
+  income_50_100k: 0.33
+  income_over_100k: 0.34
