@@ -5,6 +5,7 @@ import hashlib
 import json
 import logging
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from difflib import get_close_matches
 from pathlib import Path
 
@@ -112,39 +113,44 @@ def run_survey(
     template_path: Path,
     run_id: str,
     use_cache: bool = True,
+    max_workers: int = 8,
 ) -> RawResponses:
+    clients = {model_id: ReplicateClient(model_id) for model_id in model_ids}
+
+    def _task(model_id: str, question: "Question", participant: "SyntheticParticipant") -> RawResponse:
+        prompt = render_prompt(template_path, participant, question)
+        raw = clients[model_id].complete(prompt, use_cache=use_cache)
+        parsed = parse_response(raw, question)
+        if parsed is None:
+            logger.warning(
+                "Parse failure: model=%s q=%s p=%s raw=%r",
+                model_id, question.id, participant.id, raw,
+            )
+        return RawResponse(
+            participant_id=participant.id,
+            model=model_id,
+            question_id=question.id,
+            raw=raw,
+            parsed=parsed,
+        )
+
+    tasks = [
+        (model_id, question, participant)
+        for model_id in model_ids
+        for question in survey.questions
+        for participant in participants
+    ]
+
     responses: list[RawResponse] = []
-    parse_failures = 0
-    total = 0
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
+        futures = {executor.submit(_task, *args): args for args in tasks}
+        for future in as_completed(futures):
+            responses.append(future.result())
 
-    for model_id in model_ids:
-        client = ReplicateClient(model_id)
-        for question in survey.questions:
-            for participant in participants:
-                prompt = render_prompt(template_path, participant, question)
-                raw = client.complete(prompt, use_cache=use_cache)
-                parsed = parse_response(raw, question)
-                total += 1
-                if parsed is None:
-                    parse_failures += 1
-                    logger.warning(
-                        "Parse failure: model=%s q=%s p=%s raw=%r",
-                        model_id, question.id, participant.id, raw,
-                    )
-                responses.append(
-                    RawResponse(
-                        participant_id=participant.id,
-                        model=model_id,
-                        question_id=question.id,
-                        raw=raw,
-                        parsed=parsed,
-                    )
-                )
-
-    if total:
-        failure_pct = parse_failures / total * 100
-        if failure_pct > 5:
-            logger.warning("High parse failure rate: %.1f%%", failure_pct)
+    parse_failures = sum(1 for r in responses if r.parsed is None)
+    total = len(responses)
+    if total and parse_failures / total * 100 > 5:
+        logger.warning("High parse failure rate: %.1f%%", parse_failures / total * 100)
 
     return RawResponses(
         run_id=run_id,
