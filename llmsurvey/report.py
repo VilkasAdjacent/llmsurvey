@@ -10,7 +10,7 @@ from llmsurvey.models.results import RunResults, RunStats
 
 logger = logging.getLogger(__name__)
 
-_SUMMARY_MODEL = "meta/llama-4-scout"
+_SUMMARY_MODEL = "anthropic/claude-opus-4.6"
 
 _PROMPT_TEMPLATE = """\
 You are a research assistant summarizing results from an LLM survey simulation study.

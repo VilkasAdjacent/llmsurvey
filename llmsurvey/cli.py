@@ -40,7 +40,7 @@ def cli():
 
 @cli.command()
 @click.argument("survey_dir", type=click.Path(exists=True, file_okay=False, path_type=Path))
-@click.option("--models", default="meta/llama-4-scout", show_default=True,
+@click.option("--models", default="google/gemini-3-flash", show_default=True,
               help="Comma-separated Replicate model IDs")
 @click.option("--n", default=50, show_default=True, help="Number of synthetic participants")
 @click.option("--seed", default=42, show_default=True, help="RNG seed")
@@ -167,6 +167,20 @@ def report(run_dir: Path, no_summary: bool):
 
 
 @cli.command()
+@click.option("--host", default="127.0.0.1", show_default=True)
+@click.option("--port", default=8000, type=int, show_default=True)
+@click.option("--surveys-dir", default="surveys", type=click.Path(), show_default=True)
+@click.option("--no-ui", is_flag=True, help="API only, skip serving built frontend")
+def serve(host, port, surveys_dir, no_ui):
+    """Start the web UI server."""
+    import uvicorn
+    from llmsurvey.server import create_app
+    dist_dir = Path("frontend/dist") if not no_ui else None
+    app = create_app(surveys_dir=Path(surveys_dir), dist_dir=dist_dir)
+    uvicorn.run(app, host=host, port=port)
+
+
+@cli.command()
 @click.argument("name")
 def new(name: str):
     """Scaffold a new survey directory with template YAML files."""
@@ -230,4 +244,4 @@ manual_distribution:
 
     click.echo(f"Created survey scaffold at {survey_dir}")
     click.echo(f"  Edit {survey_yaml.name} and {demo_yaml.name} then run:")
-    click.echo(f"  llmsurvey run {survey_dir} --models meta/llama-4-scout --n 50")
+    click.echo(f"  llmsurvey run {survey_dir} --models google/gemini-3-flash --n 50")
